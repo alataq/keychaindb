@@ -1,4 +1,4 @@
-const { openSync, appendFileSync, readFileSync, unlinkSync } = require("node:fs");
+const { openSync, appendFileSync, readFileSync } = require("node:fs");
 const path = require("path");
 
 function SOCDriver(db, config) {
