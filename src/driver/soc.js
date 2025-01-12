@@ -26,12 +26,25 @@ function SOCDriver(db, config) {
         } else if (typeof value === 'object') {
             valueType = 'json';
             stringValue = JSON.stringify(value);
+        } else if (typeof value === 'number') {
+            valueType = 'integer';
+            stringValue = value.toString();
+        } else if (typeof value === 'boolean') {
+            valueType = 'boolean';
+            stringValue = value.toString();
         } else {
-            valueType = typeof value;
+            valueType = 'string';
             stringValue = value.toString();
         }
 
-        const data = `SET ${key} ${valueType} '${stringValue}' ${writedate} ${expire}\n`;
+        const operation = {
+            type: valueType,
+            value: stringValue,
+            createdAt: writedate,
+            expireAt: expire
+        };
+
+        const data = `SET ${key} ${JSON.stringify(operation)}\n`;
         appendFileSync(db.SOCfilePath, data);
     });
 
@@ -49,35 +62,35 @@ function SOCDriver(db, config) {
         for (const line of lines) {
             if (line.trim() === '') continue;
 
-            const [command, key, valueType, ...value] = line.split(' ');
+            const [command, key, ...operationJson] = line.split(' ');
             if (command === 'SET') {
+                const operation = JSON.parse(operationJson.join(' '));
                 let parsedValue;
-                switch (valueType) {
+
+                switch (operation.type) {
                     case 'string':
-                        parsedValue = value[0].replace(/'/g, '');
+                        parsedValue = operation.value;
                         break;
-                    case 'number':
-                        parsedValue = parseFloat(value[0].replace(/'/g, ''));
+                    case 'integer':
+                        parsedValue = parseInt(operation.value);
                         break;
                     case 'boolean':
-                        parsedValue = value[0].replace(/'/g, '').toLowerCase() === 'true';
+                        parsedValue = operation.value.toLowerCase() === 'true';
                         break;
                     case 'array':
-                        parsedValue = JSON.parse(value[0].replace(/'/g, ''));
+                        parsedValue = JSON.parse(operation.value);
                         break;
                     case 'json':
-                        parsedValue = JSON.parse(value[0].replace(/'/g, ''));
+                        parsedValue = JSON.parse(operation.value);
                         break;
                     default:
-                        throw new Error(`Unsupported value type: ${valueType}`);
+                        throw new Error(`Unsupported value type: ${operation.type}`);
                 }
-                const writedate = parseInt(value[value.length - 2]);
-                const expire = parseInt(value[value.length - 1]);
 
                 db.cache.set(key, {
                     value: parsedValue,
-                    writedate,
-                    expire
+                    writedate: operation.createdAt,
+                    expire: operation.expireAt
                 });
             } else if (command === 'DELETE') {
                 db.cache.delete(key);
