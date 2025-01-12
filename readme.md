@@ -23,13 +23,13 @@ npm install keychaindb
 To start using KeychainDB, initialize the database and use the SOCDriver for persistence:
 
 ```js
-const { Database, SOCDriver } = require("./src/index");
+const { Database, SOCDriver } = require("keychaindb");
 const path = require("path");
 
 const db = new Database();
 db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") });
 ```
-###Setting Values
+### Setting Values
 You can set values with an optional expiration time (in milliseconds):
 
 ```js
