@@ -1,0 +1,11 @@
+{
+  "name": "keychaindb",
+  "version": "1.0.0",
+  "description": "A fast key value database",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Alataq",
+  "license": "ISC"
+}
