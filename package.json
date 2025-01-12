@@ -7,5 +7,16 @@
     "test": "node test.js"
   },
   "author": "Alataq",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alataq/keychaindb.git"
+  },
+  "keywords": [
+    "database"
+  ],
+  "bugs": {
+    "url": "https://github.com/Alataq/keychaindb/issues"
+  },
+  "homepage": "https://github.com/Alataq/keychaindb#readme"
 }
