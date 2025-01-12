@@ -42,14 +42,14 @@ Retrieve values using the get method:
 ```js
 db.get("key")
 ```
-# Deleting Values
+### Deleting Values
 Delete values using the delete method:
 
 ```js
 db.delete("key");
 ```
 
-# Event Handling
+### Event Handling
 Listen for events like ready, set, and delete:
 
 ```js
@@ -66,7 +66,7 @@ db.on("delete", (key) => {
 });
 ```
 
-# Logging In
+### Logging In
 To start the database, call the login method:
 
 ```js
