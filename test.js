@@ -54,5 +54,15 @@ db.on("ready", () => {
     }, 26000);
 });
 
+// Event listener for when a value is set
+db.on("set", (key, value, writedate, expire) => {
+    console.log(`Key ${key} set with value ${value} and expire at ${expire}`);
+});
+
+// Event listener for when a value is deleted
+db.on("delete", (key) => {
+    console.log(`Key ${key} deleted`);
+});
+
 // Log in to the database
 db.login();
