@@ -33,7 +33,7 @@ db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") });
 You can set values with an optional expiration time (in milliseconds):
 
 ```js
-db.set("key", "value", Date.now() + 10000); // expires in 10 seconds
+db.set("key", "value", 10000); // expires in 10 seconds
 ```
 
 ### Getting Values

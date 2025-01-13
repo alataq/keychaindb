@@ -1,3 +1,4 @@
+// Solid Operation Cache
 const { openSync, appendFileSync, readFileSync } = require("node:fs");
 const path = require("path");
 

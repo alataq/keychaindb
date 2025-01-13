@@ -20,8 +20,9 @@ class Database {
         }
     }
 
-    set(key, value, expire = 0) {
+    set(key, value, expire) {
         let writedate = Date.now()
+        expire = expire ? writedate + expire : 0
         this.cache.set(key, {
             value,
             writedate,

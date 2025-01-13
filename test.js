@@ -12,11 +12,11 @@ db.on("ready", () => {
     console.log("Database is ready");
 
     // Test setting values of all types
-    db.set("key1", "value1", Date.now() + 5000); // string
-    db.set("key2", 42, Date.now() + 10000); // number
-    db.set("key3", true, Date.now() + 15000); // boolean
-    db.set("key4", [1, 2, 3], Date.now() + 20000); // array
-    db.set("key5", { name: "John", age: 30 }, Date.now() + 25000); // json
+    db.set("key1", "value1", 5000); // string
+    db.set("key2", 42, 10000); // number
+    db.set("key3", true, 15000); // boolean
+    db.set("key4", [1, 2, 3], 20000); // array
+    db.set("key5", { name: "John", age: 30 }, 25000); // json
 
     // Test getting values immediately
     console.log("Initial values:");
