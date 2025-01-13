@@ -95,6 +95,39 @@ class Database {
         return entryJson.value
     }
 
+    find(query) {
+        const results = [];
+    
+        for (const [key, entry] of this.cache) {
+            if (this.isExpired(key)) continue;
+    
+            let match = false;
+    
+            if (typeof query === 'object') {
+                for (const [field, value] of Object.entries(query)) {
+                    if (entry.value[field] === value) {
+                        match = true;
+                    } else {
+                        match = false;
+                        break;
+                    }
+                }
+            } else if (typeof query === 'function') {
+                match = query(entry.value);
+            } else if (query instanceof RegExp) {
+                match = query.test(entry.value);
+            } else {
+                match = entry.value === query;
+            }
+    
+            if (match) {
+                results.push({ key, value: entry.value });
+            }
+        }
+    
+        return results;
+    }
+
     has(key){
         return this.cache.has(key)
     }
