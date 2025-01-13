@@ -24,7 +24,6 @@ To start using KeychainDB, initialize the database :
 
 ```js
 const { Database } = require("keychaindb");
-const path = require("path");
 
 const db = new Database();
 ```
@@ -106,10 +105,11 @@ KeychainDB offer some builtin drivers for your databases. The following drivers 
 The SOC driver store every write operation in a file to allow reconstruction of the database in case of reboot.
 
 ### Initialization
-You first need to import the SOC driver and initialize it:
+You first need to import the SOC driver and initialize it. You need to have path for the file name. :
 
 ```js
 const { SOCDriver } = require("keychainedb");
+const path = require("path");
 
 db.use(SOCDriver, { path: path.join(__dirname, "fileName.kcdb") });
 ```
