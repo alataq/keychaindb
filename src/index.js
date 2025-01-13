@@ -173,6 +173,17 @@ class Database {
         this.controller.beforeReady.push(callback)
     }
 
+    keys(){
+        return this.cache.keys()
+    }
+
+    values(){
+        return this.cache.values()
+    }
+
+    entries(){
+        return this.cache.entries()
+    }
 }
 
 module.exports = {Database, SOCDriver}

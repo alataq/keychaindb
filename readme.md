@@ -74,6 +74,26 @@ db.find((value) => value.name === "John" && value.age > 25);
 db.find(/hello/);
 ```
 
+### Getting all Keys
+You can get all keys using the keys method:
+
+```js
+db.keys()
+```
+
+### Getting all Values
+You can get all values using the values method:
+```js
+db.values()
+```
+
+### Getting all Entries
+You can get all entries using the entries method:
+
+```js
+db.entries()
+```
+
 ### Event Handling
 Listen for events like ready, set, and delete:
 

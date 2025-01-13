@@ -49,6 +49,18 @@ db.on("ready", () => {
     const results4 = db.find("value1");
     console.log(results4);
 
+    // Test keys method
+    console.log("\nAll keys:");
+    console.log(db.keys());
+
+    // Test values method
+    console.log("\nAll values:");
+    console.log(db.values());
+
+    // Test entries method
+    console.log("\nAll entries:");
+    console.log(db.entries());
+
     // Test expiration
     setTimeout(() => {
         console.log("\nAfter 6 seconds (key1 should expire):");
