@@ -20,14 +20,13 @@ npm install keychaindb
 
 ## Usage
 ### Initialization
-To start using KeychainDB, initialize the database and use the SOCDriver for persistence:
+To start using KeychainDB, initialize the database :
 
 ```js
-const { Database, SOCDriver } = require("keychaindb");
+const { Database } = require("keychaindb");
 const path = require("path");
 
 const db = new Database();
-db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") });
 ```
 ### Setting Values
 You can set values with an optional expiration time (in milliseconds):
@@ -73,11 +72,26 @@ To start the database, call the login method:
 db.login();
 ```
 
-## License
+# Builtin Drivers
+KeychainDB offer some builtin drivers for your databases. The following drivers are available:
+
+## Solid Operation Cache (SOC)
+The SOC driver store every write operation in a file to allow reconstruction of the database in case of reboot.
+
+### Initialization
+You first need to import the SOC driver and initialize it:
+
+```js
+const { SOCDriver } = require("keychainedb");
+
+db.use(SOCDriver, { path: path.join(__dirname, "fileName.kcdb") });
+```
+
+# License
 KeychainDB is licensed under the ISC License. See the LICENSE file for more details.
 
-## Contributing
+# Contributing
 Contributions are welcome! Please open an issue or submit a pull request on GitHub.
 
-## Author
-Made with love by Alataq
+# Author
+Made with ❤️ by Alataq
