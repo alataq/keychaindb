@@ -5,7 +5,7 @@ const path = require("path");
 const db = new Database();
 
 // Use the SOCDriver to create a new database file
-db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") })
+db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") });
 
 // Event listener for when the database is ready
 db.on("ready", () => {
@@ -17,6 +17,9 @@ db.on("ready", () => {
     db.set("key3", true, 15000); // boolean
     db.set("key4", [1, 2, 3], 20000); // array
     db.set("key5", { name: "John", age: 30 }, 25000); // json
+    db.set("key6", { name: "Jane", age: 25 }, 25000); // json
+    db.set("key7", { name: "John", age: 35 }, 25000); // json
+    db.set("key8", "Hello World", 25000); // string
 
     // Test getting values immediately
     console.log("Initial values:");
@@ -25,6 +28,26 @@ db.on("ready", () => {
     console.log("key3 (boolean):", db.get("key3"));
     console.log("key4 (array):", db.get("key4"));
     console.log("key5 (json):", db.get("key5"));
+
+    // Test find method with object query
+    console.log("\nFind all entries with name 'John':");
+    const results1 = db.find({ name: "John" });
+    console.log(results1);
+
+    // Test find method with function query
+    console.log("\nFind all entries with age greater than 25:");
+    const results2 = db.find((value) => value.age > 25);
+    console.log(results2);
+
+    // Test find method with regex query
+    console.log("\nFind all entries with value containing 'Hello':");
+    const results3 = db.find(/Hello/);
+    console.log(results3);
+
+    // Test find method with value query
+    console.log("\nFind all entries with value 'value1':");
+    const results4 = db.find("value1");
+    console.log(results4);
 
     // Test expiration
     setTimeout(() => {
