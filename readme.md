@@ -50,25 +50,25 @@ db.delete("key");
 ### Finding Values
 Find values using the find method:
 
-** You can find all keys having a specific value **
+**You can find all keys having a specific value**
 
 ```js
 db.find("value")
 ```
 
-** You can use json to find values **
+**You can use json to find values**
 
 ```js
 db.find({ name: "John", age: 30 });
 ```
 
-** You can use a function to find values **
+**You can use a function to find values**
 
 ```js
 db.find((value) => value.name === "John" && value.age > 25);
 ```
 
-** You can use a regex to find values **
+**You can use a regex to find values**
 
 ```js
 db.find(/hello/);
