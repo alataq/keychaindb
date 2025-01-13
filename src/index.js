@@ -9,31 +9,36 @@ class Database {
     }
 
     on(eventName, callback) {
-        this.events.push({ eventName, callback });
+        this.events.push({ eventName, callback })
     }
 
     emit(eventName, ...args) {
         for(let event of this.events) {
             if(event.eventName === eventName) {
-                event.callback(...args);
+                event.callback(...args)
             }
         }
     }
 
     set(key, value, expire) {
+        let data = []
         let writedate = Date.now()
-        expire = expire ? writedate + expire : 0
+
+        expire = expire ? writedate + expire : 0;
+
         this.cache.set(key, {
             value,
             writedate,
-            expire
-        });
-        this.emit('set', key, value, writedate, expire);
+            expire,
+            ...data
+        })
+
+        this.emit('set', key, value, writedate, expire)
     }
 
     delete(key){
-        this.cache.delete(key);
-        this.emit('delete', key);
+        this.cache.delete(key)
+        this.emit('delete', key)
     }
 
     get(key){
@@ -41,31 +46,31 @@ class Database {
     }
 
     has(key){
-        return this.cache.has(key);
+        return this.cache.has(key)
     }
 
     login() {
-            this.isReady = true;
-            this.emit('ready');
+            this.isReady = true
+            this.emit('ready')
     }
 
     isExpired(key) {
-        const cacheEntry = this.cache.get(key);
+        const cacheEntry = this.cache.get(key)
         if (!cacheEntry) {
-            return false;
+            return false
         }
     
         const expireDate = cacheEntry.expire;
         const currentDate = Date.now();
     
-        return (expireDate <= currentDate) && (expireDate !== 0);
+        return (expireDate <= currentDate) && (expireDate !== 0)
     }
 
     use(callback, options = {}) {
         try {
             callback(this, options)
         } catch (error) {
-            throw new Error(`Impossible to load a plugin or driver : ${error.message}`);
+            throw new Error(`Impossible to load a plugin or driver : ${error.message}`)
         }
     }
 

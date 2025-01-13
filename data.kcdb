@@ -1,0 +1,6 @@
+SET key1 {"type":"string","value":"value1","createdAt":1736729941289,"expireAt":1736729946289}
+SET key2 {"type":"integer","value":"42","createdAt":1736729941290,"expireAt":1736729951290}
+SET key3 {"type":"boolean","value":"true","createdAt":1736729941290,"expireAt":1736729956290}
+SET key4 {"type":"array","value":"[1,2,3]","createdAt":1736729941290,"expireAt":1736729961290}
+SET key5 {"type":"json","value":"{\"name\":\"John\",\"age\":30}","createdAt":1736729941290,"expireAt":1736729966290}
+DELETE key2
