@@ -87,6 +87,13 @@ db.on("ready", () => {
         console.log("key4 (array):", db.get("key4"));
         console.log("key5 (json):", db.get("key5"));
     }, 26000);
+
+    // Test reconstruct method
+    setTimeout(() => {
+        console.log("\nReconstructing database...");
+        db.SOCManager.reconstruct();
+        console.log("Database reconstructed.");
+    }, 30000);
 });
 
 // Event listener for when a value is set

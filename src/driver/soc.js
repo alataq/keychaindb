@@ -1,5 +1,5 @@
 // Solid Operation Cache
-const { openSync, appendFileSync, readFileSync } = require("node:fs");
+const { openSync, appendFileSync, readFileSync, closeSync, unlinkSync, renameSync } = require("node:fs");
 const path = require("path");
 
 function SOCDriver(db, config) {
@@ -16,44 +16,123 @@ function SOCDriver(db, config) {
         throw new Error(`Failed to initialize database file: ${error.message}`)
     }
 
+    db.SOCManager = {
+        reconstruct: () => {
+            db.SOCManager.writing = true;
+        
+            const tempFilePath = `${db.SOCfilePath}.temp`;
+            const tempFile = openSync(tempFilePath, 'w+'); // Open in write mode, create if not exists
+        
+            // Write all operations to the temp file
+            for (const [key, entry] of db.cache) {
+                let valueType = typeof entry.value;
+                let stringValue;
+        
+                if (Array.isArray(entry.value)) {
+                    valueType = 'array';
+                    stringValue = JSON.stringify(entry.value);
+                } else if (typeof entry.value === 'object') {
+                    valueType = 'json';
+                    stringValue = JSON.stringify(entry.value);
+                } else if (typeof entry.value === 'number') {
+                    valueType = 'integer';
+                    stringValue = entry.value.toString();
+                } else if (typeof entry.value === 'boolean') {
+                    valueType = 'boolean';
+                    stringValue = entry.value.toString();
+                } else {
+                    valueType = 'string';
+                    stringValue = entry.value.toString();
+                }
+        
+                const operation = {
+                    type: valueType,
+                    value: stringValue,
+                    createdAt: entry.writedate,
+                    expireAt: entry.expire,
+                };
+        
+                const data = `SET ${key} ${JSON.stringify(operation)}\n`;
+                appendFileSync(tempFile, data);
+            }
+        
+            // Close the temp file
+            closeSync(tempFile);
+
+            // Close the original file
+            closeSync(db.fileSOC);
+        
+            // Delete the old file
+            unlinkSync(db.SOCfilePath);
+        
+            // Rename the temp file to the original file name
+            renameSync(tempFilePath, db.SOCfilePath);
+        
+            // Reopen the file in append mode
+            db.fileSOC = openSync(db.SOCfilePath, 'a+');
+        
+            // Process the queue
+            while (db.SOCManager.queue.length > 0) {
+                const operation = db.SOCManager.queue.shift();
+                if (operation.type === 'delete') {
+                    db.delete(operation.key);
+                } else {
+                    db.set(operation.key, operation.value, operation.expire);
+                }
+            }
+        
+            db.SOCManager.writing = false;
+        },
+        queue: [],
+        writing: false,
+    }
+
     // Listen for 'set' events
-    db.on('set', (key, value, writedate, expire) => {
-        let valueType
-        let stringValue
+db.on('set', (key, value, writedate, expire) => {
+    if (db.SOCManager.writing) {
+        db.SOCManager.queue.push({ key, value, writedate, expire });
+    } else {
+        let valueType;
+        let stringValue;
 
         if (Array.isArray(value)) {
-            valueType = 'array'
-            stringValue = JSON.stringify(value)
+            valueType = 'array';
+            stringValue = JSON.stringify(value);
         } else if (typeof value === 'object') {
-            valueType = 'json'
-            stringValue = JSON.stringify(value)
+            valueType = 'json';
+            stringValue = JSON.stringify(value);
         } else if (typeof value === 'number') {
-            valueType = 'integer'
-            stringValue = value.toString()
+            valueType = 'integer';
+            stringValue = value.toString();
         } else if (typeof value === 'boolean') {
-            valueType = 'boolean'
-            stringValue = value.toString()
+            valueType = 'boolean';
+            stringValue = value.toString();
         } else {
-            valueType = 'string'
-            stringValue = value.toString()
+            valueType = 'string';
+            stringValue = value.toString();
         }
 
         const operation = {
             type: valueType,
             value: stringValue,
             createdAt: writedate,
-            expireAt: expire
+            expireAt: expire,
         };
 
-        const data = `SET ${key} ${JSON.stringify(operation)}\n`
-        appendFileSync(db.SOCfilePath, data)
-    });
+        const data = `SET ${key} ${JSON.stringify(operation)}\n`;
+        appendFileSync(db.fileSOC, data);
+    }
+});
 
-    // Listen for 'delete' events
-    db.on('delete', (key) => {
-        const data = `DELETE ${key}\n`
-        appendFileSync(db.SOCfilePath, data)
-    });
+// Listen for 'delete' events
+db.on('delete', (key) => {
+    if (db.SOCManager.writing) {
+        db.SOCManager.queue.push({ key, type: 'delete' });
+    } else {
+        const data = `DELETE ${key}\n`;
+        appendFileSync(db.fileSOC, data);
+    }
+});
 
     // Parse the database file and reconstruct the cache
     try {

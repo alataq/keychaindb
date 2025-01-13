@@ -134,6 +134,13 @@ const path = require("path");
 db.use(SOCDriver, { path: path.join(__dirname, "fileName.kcdb") });
 ```
 
+### Rebuilding
+You can rebuild the database by calling the reconstruct method on the SOC manager:
+
+```js
+db.SOCManager.reconstruct()
+```
+
 # License
 KeychainDB is licensed under the ISC License. See the LICENSE file for more details.
 

@@ -1,6 +1,6 @@
 {
   "name": "keychaindb",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A fast key value database",
   "main": "src/index.js",
   "scripts": {
