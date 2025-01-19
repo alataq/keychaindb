@@ -135,7 +135,7 @@ db.use(SOCDriver, { path: path.join(__dirname, "fileName.kcdb") });
 ```
 
 ### Rebuilding
-You can rebuild the database by calling the reconstruct method on the SOC manager:
+You can rebuild the database by calling the reconstruct method on the SOC manager. It will return a promise. :
 
 ```js
 db.SOCManager.reconstruct()
