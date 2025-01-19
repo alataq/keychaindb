@@ -50,46 +50,49 @@ function SOCDriver(db, config) {
 
     db.SOCManager = {
         reconstruct: () => {
-            db.SOCManager.writing = true;
-    
-            const tempFilePath = `${db.SOCfilePath}.temp`;
-            const tempFile = openSync(tempFilePath, 'a+'); // Open in write mode, create if not exists
-    
-            // Write all operations to the temp file
-            for (const [key, entry] of db.cache) {
-                appendOperationToFile(tempFile, key, {
-                    value: entry.value,
-                    writedate: entry.writedate,
-                    expire: entry.expire,
-                });
-            }
-    
-            // Close the temp file
-            closeSync(tempFile);
-    
-            // Close the original file
-            closeSync(db.fileSOC);
-    
-            // Delete the old file
-            unlinkSync(db.SOCfilePath);
-    
-            // Rename the temp file to the original file name
-            renameSync(tempFilePath, db.SOCfilePath);
-    
-            // Reopen the file in append mode
-            db.fileSOC = openSync(db.SOCfilePath, 'a+');
-    
-            // Process the queue
-            while (db.SOCManager.queue.length > 0) {
-                const operation = db.SOCManager.queue.shift();
-                if (operation.type === 'delete') {
-                    db.delete(operation.key);
-                } else {
-                    db.set(operation.key, operation.value, operation.expire);
+            return new Promise((resolve, reject) => {
+                db.SOCManager.writing = true;
+        
+                const tempFilePath = `${db.SOCfilePath}.temp`;
+                const tempFile = openSync(tempFilePath, 'a+'); // Open in write mode, create if not exists
+        
+                // Write all operations to the temp file
+                for (const [key, entry] of db.cache) {
+                    appendOperationToFile(tempFile, key, {
+                        value: entry.value,
+                        writedate: entry.writedate,
+                        expire: entry.expire,
+                    });
                 }
-            }
-    
-            db.SOCManager.writing = false;
+        
+                // Close the temp file
+                closeSync(tempFile);
+        
+                // Close the original file
+                closeSync(db.fileSOC);
+        
+                // Delete the old file
+                unlinkSync(db.SOCfilePath);
+        
+                // Rename the temp file to the original file name
+                renameSync(tempFilePath, db.SOCfilePath);
+        
+                // Reopen the file in append mode
+                db.fileSOC = openSync(db.SOCfilePath, 'a+');
+        
+                // Process the queue
+                while (db.SOCManager.queue.length > 0) {
+                    const operation = db.SOCManager.queue.shift();
+                    if (operation.type === 'delete') {
+                        db.delete(operation.key);
+                    } else {
+                        db.set(operation.key, operation.value, operation.expire);
+                    }
+                }
+        
+                db.SOCManager.writing = false;
+                resolve()
+            })
         },
         queue: [],
         writing: false,
