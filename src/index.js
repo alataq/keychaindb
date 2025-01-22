@@ -80,9 +80,7 @@ class Database {
     
         let entryJson = {
             key,
-            value: entry.value,
-            writedate: entry.writedate,
-            expire: entry.expire,
+            ...entry
         };
     
         for (const hook of this.controller.beforeGet) {
