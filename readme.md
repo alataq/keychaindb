@@ -149,3 +149,5 @@ Contributions are welcome! Please open an issue or submit a pull request on GitH
 
 # Author
 Made with ❤️ by Alataq
+
+*Project owned by [Nerexon](https://nerexon.com/)*
