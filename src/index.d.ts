@@ -24,9 +24,29 @@ export declare function ControllerCallback(entry: {
  * @param {Object} config - Configuration of the driver
  * @param {string} config.path - Cache storage file path
 **/
-export declare function SOCDriver(
+export declare function SOCDriver(db: Database, config: {path: string}): void;
+
+/**
+ *  `persistent` is a driver for the `Database` class used to periodically
+ *  save read content to a text file.
+ *
+ *  Usage:
+ *  ```js
+ *  const db = new Database();
+ *
+ *  db.use(PersistentDriver, { path: <filename> });
+ *  ```
+ * 
+ * @param {Database} db - Database to operate on.
+ * @param {Object} config - Driver configuration.
+ * @param {string} config.path - Path of the file to save data to.
+ * 
+ * Adds the following public properties to db:
+ * @property {Function} reconstruct - Reset the database with file content.
+**/
+export declare function PersistentDriver(
     db: Database,
-    config?: Partial<{path: string}>
+    config: {path: string}
 ): void;
 
 /**
