@@ -42,7 +42,7 @@ export declare function SOCDriver(db: Database, config: {path: string}): void;
  * @param {string} config.path - Path of the file to save data to.
  * 
  * Adds the following public properties to db:
- * @property {Function} reconstruct - Reset the database with file content.
+ * @property {Function} fromStorage - Reset the database with file content.
 **/
 export declare function PersistentDriver(
     db: Database,

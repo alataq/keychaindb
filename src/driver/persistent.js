@@ -62,7 +62,7 @@ function readDatabase(db) {
  * @param {string} config.path - Path of the file to save data to.
  * 
  * Adds the following public properties to db:
- * @property {Function} reconstruct - Reset the database with file content.
+ * @property {Function} fromStorage - Reset the database with file content.
 **/
 function PersistentDriver(db, config) {
     if (!config.path)
@@ -70,7 +70,7 @@ function PersistentDriver(db, config) {
     db._persistentPath = config.path;
     db._persistentFile = createPath(config.path);
     db._changes = 0;
-    db.reconstruct = () => readDatabase(db);
+    db.fromStorage = () => readDatabase(db);
     db.on("set", () => db._changes++);
     db.on("delete", () => db._changes++);
     setInterval(() => {
