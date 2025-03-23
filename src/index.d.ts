@@ -1,4 +1,9 @@
 /**
+ * @author Johan Delhomme Montorfano <me@johanmontorfano.com>
+ * @description Types and JSDoc descriptions.
+**/ 
+
+/**
  * @param {Object} entry - Entry that has been manipulated
  * @param {string} entry.key
  * @param {any} entry.value

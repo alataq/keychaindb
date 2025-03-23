@@ -1,3 +1,9 @@
+/**
+ * @author Johan Delhomme Montorfano <me@johanmontorfano.com>
+ * @description PersistentDriver file definition to allow for non-cache based
+ * storage.
+**/ 
+
 const { openSync, writeFileSync, readFileSync } = require("node:fs");
 
 /**
