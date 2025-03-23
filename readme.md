@@ -141,6 +141,28 @@ You can rebuild the database by calling the reconstruct method on the SOC manage
 db.SOCManager.reconstruct()
 ```
 
+## Persistent
+The Persistent driver stores database content into a key/value file periodically, to recover from shutdowns
+with a concise representation of the database.
+
+### Initialization
+You first need to import the Persistent driver and initialize it. You need to give if a path to save to:
+
+```js
+const { PersistentDriver } = require("keychaindb");
+const path = require("path");
+
+db.use(PersistentDriver, { path: path.join(__dirname, "persistent.db") });
+```
+
+### Rebuilding
+You can rebuild the database instance from the content stored on the disk by calling:
+```js
+db.fromStorage();
+```
+
+The operation is synchronous.
+
 # License
 KeychainDB is licensed under the ISC License. See the LICENSE file for more details.
 
