@@ -54,16 +54,77 @@ export declare function PersistentDriver(
  * Database instance.
 **/
 export declare class Database {
-    constructor(config: {});
+    constructor();
+    /**
+     * Add a event listener for specific events.
+     * 
+     * @param {string} eventName - Event to subscribe to. Events sent by
+     * default are "ready, "set" and "delete".
+     * @param {Function} callback - Callback function that takes an infinite
+     * number of arguments.
+    **/
     on(eventName: string, callback: (...args: any) => void): void;
+    /**
+     * Emit an event to listeners.
+     *
+     * @param {string} eventName
+     * @param {...any} args - Arguments to submit to listeners.
+    **/
     emit(eventName: string, ...args: any): void;
+    /**
+     * Set a key/pair to the database.
+     *
+     * @param {any} key
+     * @param {any} value
+     * @param {number} expire - Cache expiration
+    **/
     set(key: any, value: any, expire: number): void;
+    /**
+     * Key/pair to delete from the database.
+     *
+     * @param {any] key
+    **/
     delete(key: any): void;
+    /**
+     * Retrieve the value of a key.
+     *
+     * @param {any} key
+     * @returns {any}
+    **/
     get(key: any): any;
-    find(query: any): any[];
+    /**
+     * Search for matching key/pair by values.
+     *
+     * @param {any} query
+     * @returns {Array<Object>} - List of results
+     * @returns {Array<Object>[i].key}
+     * @returns {Array<Object>[i].value}
+    **/
+    find(query: any): {key: any, value: any}[];
+    /**
+     * Determine if a key exist.
+     *
+     * @param {any} key
+     * @returns {boolean}
+    **/
     has(key: any): boolean;
+    /**
+     * Emit a "ready" event and mark the database as ready.
+    **/
     login(): void;
+    /**
+     * Determines if a key has expired in cache.
+     *
+     * @param {any} key
+     * @returns {boolean}
+    **/
     isExpired(key: any): boolean;
+    /**
+     * Implement a plugin/driver methods to the instance. Default drivers
+     * are `SOCDriver` and `PersistentDriver`.
+     *
+     * @param {Function} callback - Plugin/driver initializer
+    **/
     use(callback: (instance: Database, options: any) => void): void;
     beforeSet(callback: ControllerCallback): void;
     beforeGet(callback: ControllerCallback): void;
