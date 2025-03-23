@@ -47,8 +47,8 @@ function readDatabase(db) {
 }
 
 /**
- *  `persistent` is a driver for the `Database` class used to periodically
- *  save read content to a text file.
+ *  Driver for the `Database` class used to periodically
+ *  save content to a text file.
  *
  *  Usage:
  *  ```js

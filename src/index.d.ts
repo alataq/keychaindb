@@ -27,7 +27,7 @@ export declare function ControllerCallback(entry: {
 export declare function SOCDriver(db: Database, config: {path: string}): void;
 
 /**
- *  `persistent` is a driver for the `Database` class used to periodically
+ *  Driver for the `Database` class used to periodically
  *  save read content to a text file.
  *
  *  Usage:
