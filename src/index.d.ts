@@ -54,6 +54,10 @@ export declare function PersistentDriver(
     config: {path: string}
 ): void;
 
+export interface PersistentDriverExtends {
+    fromStorage(): void;
+}
+
 /**
  * @class
  * Database instance.
@@ -130,7 +134,7 @@ export declare class Database {
      *
      * @param {Function} callback - Plugin/driver initializer
     **/
-    use(callback: (instance: Database, options: any) => void): void;
+    use(callback: (instance: Database, options: any) => void, config: any): void;
     beforeSet(callback: ControllerCallback): void;
     beforeGet(callback: ControllerCallback): void;
     beforeDelete(callback: ControllerCallback): void;
