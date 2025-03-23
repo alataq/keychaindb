@@ -13,7 +13,7 @@ const { openSync, writeFileSync, readFileSync } = require("node:fs");
 **/
 function createPath(path) {
     try {
-        return openSync(path, "r+");
+        return openSync(path, "w+");
     } catch ({message: msg}) {
         throw new Error(`PersistentDriver: filesystem error! ${msg}`);
     }
@@ -25,14 +25,15 @@ function createPath(path) {
  * @param {Database} db
 **/
 function writeDatabase(db) {
-    const outContent = "";
+    let outContent = "";
 
-    db.entries().forEach(([key, value]) => {
+    db.entries().forEach(([key, {value}]) => {
         if (typeof key === "string" && key.indexOf("\t") > -1)
             throw new Error("PersistentDriver: Found tabs in a key");
-        outContent += `${JSON.stringify(key)}\t${JSON.stringify(value)}`;
+        outContent += `${JSON.stringify(key)}\t${JSON.stringify(value)}\n`;
     });
-    writeFileSync(db._persistentFile, outContent);
+    console.log("$", outContent, "$");
+    writeFileSync(db._persistentPath, outContent, {flag: "w"});
 }
 
 /**
@@ -74,7 +75,6 @@ function PersistentDriver(db, config) {
     if (!config.path)
         throw new Error("PersistentDriver: Missing database path");
     db._persistentPath = config.path;
-    db._persistentFile = createPath(config.path);
     db._changes = 0;
     db.fromStorage = () => readDatabase(db);
     db.on("set", () => db._changes++);
