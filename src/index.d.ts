@@ -91,7 +91,7 @@ export declare class Database {
     /**
      * Key/pair to delete from the database.
      *
-     * @param {any] key
+     * @param {any} key
     **/
     delete(key: any): void;
     /**
@@ -135,10 +135,10 @@ export declare class Database {
      * @param {Function} callback - Plugin/driver initializer
     **/
     use(callback: (instance: Database, options: any) => void, config: any): void;
-    beforeSet(callback: ControllerCallback): void;
-    beforeGet(callback: ControllerCallback): void;
-    beforeDelete(callback: ControllerCallback): void;
-    beforeReady(callback: ControllerCallback): void;
+    beforeSet(callback: typeof ControllerCallback): void;
+    beforeGet(callback: typeof ControllerCallback): void;
+    beforeDelete(callback: typeof ControllerCallback): void;
+    beforeReady(callback: typeof ControllerCallback): void;
     keys(): any[];
     values(): any[];
     entries(): [any, any][];
