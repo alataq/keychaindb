@@ -37,13 +37,13 @@ export declare class Database {
     constructor(config: {});
     on(eventName: string, callback: (...args: any) => void): void;
     emit(eventName: string, ...args: any): void;
-    set(key: string, value: any, expire: number): void;
-    delete(key: string): void;
-    get(key: string): any;
+    set(key: any, value: any, expire: number): void;
+    delete(key: any): void;
+    get(key: any): any;
     find(query: any): any[];
-    has(key: string): boolean;
+    has(key: any): boolean;
     login(): void;
-    isExpired(key: string): boolean;
+    isExpired(key: any): boolean;
     use(callback: (instance: Database, options: any) => void): void;
     beforeSet(callback: ControllerCallback): void;
     beforeGet(callback: ControllerCallback): void;
