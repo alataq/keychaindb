@@ -3,6 +3,7 @@
   "version": "1.0.10",
   "description": "A fast key value database",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "test": "node test.js"
   },
