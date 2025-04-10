@@ -2,6 +2,7 @@
  * @author Johan Delhomme Montorfano <me@johanmontorfano.com>
  * @description PersistentDriver file definition to allow for non-cache based
  * storage.
+ * @deprecated Use the SSC driver instead.
 **/ 
 
 const { openSync, writeFileSync, readFileSync } = require("node:fs");

@@ -8,7 +8,7 @@ KeychainDB is a fast and lightweight key-value database designed for simplicity 
 - **Multiple Data Types**: Supports strings, numbers, booleans, arrays, and JSON objects.
 - **Data Expiration**: Set expiration times for keys to automatically remove stale data.
 - **Event-Driven**: Listen for events like `set`, `delete`, and `ready` to trigger custom logic.
-- **Persistence**: Uses the SOCDriver to persist data to a file, ensuring data is not lost between sessions.
+- **Persistence**: Uses the SOCDriver or SSCDriver to persist data to a file, ensuring data is not lost between sessions.
 
 ## Installation
 
