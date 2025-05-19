@@ -1,5 +1,6 @@
 const SOCDriver = require("./driver/soc")
 const PersistentDriver = require("./driver/persistent")
+const SSCDriver = require("./driver/ssc")
 
 class Database {
     constructor (config = {}) {
@@ -185,4 +186,4 @@ class Database {
     }
 }
 
-module.exports = {Database, SOCDriver, PersistentDriver}
+module.exports = {Database, SOCDriver, PersistentDriver, SSCDriver}
