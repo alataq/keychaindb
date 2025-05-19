@@ -2,6 +2,9 @@ const SOCDriver = require("./driver/soc")
 const PersistentDriver = require("./driver/persistent")
 const SSCDriver = require("./driver/ssc")
 
+/**
+ * @description The only class you'll ever need.
+ */
 class Database {
     constructor (config = {}) {
         this.events = []
