@@ -141,18 +141,18 @@ You can rebuild the database by calling the reconstruct method on the SOC manage
 db.SOCManager.reconstruct()
 ```
 
-## Persistent
-The Persistent driver stores database content into a key/value file periodically, to recover from shutdowns
+## Solid State Cache (SSC)
+The Solid State Cache driver stores database content into a key/value file periodically, to recover from shutdowns
 with a concise representation of the database.
 
 ### Initialization
-You first need to import the Persistent driver and initialize it. You need to give if a path to save to:
+You first need to import the SSC driver and initialize it. You need to give if a path to save to:
 
 ```js
-const { PersistentDriver } = require("keychaindb");
+const { SSCDriver } = require("keychaindb");
 const path = require("path");
 
-db.use(PersistentDriver, { path: path.join(__dirname, "persistent.db") });
+db.use(SSCDriver, { path: path.join(__dirname, "ssc.kcdb") });
 ```
 
 ### Rebuilding
