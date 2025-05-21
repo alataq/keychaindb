@@ -111,6 +111,14 @@ db.on("delete", (key) => {
 });
 ```
 
+To avoid bug, if an event need to be listen only one time, you can use the once method:
+
+```js
+db.once("ready", () => {
+    console.log("Database is ready");
+});
+```
+
 ### Logging In
 To start the database, call the login method:
 
