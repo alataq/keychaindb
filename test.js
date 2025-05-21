@@ -8,7 +8,7 @@ const db = new Database();
 db.use(SOCDriver, { path: path.join(__dirname, "data.kcdb") });
 
 // Event listener for when the database is ready
-db.on("ready", () => {
+db.once("ready", () => {
     console.log("Database is ready");
 
     // Test setting values of all types
