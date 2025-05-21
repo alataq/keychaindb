@@ -19,5 +19,12 @@
   "bugs": {
     "url": "https://github.com/Alataq/keychaindb/issues"
   },
-  "homepage": "https://github.com/Alataq/keychaindb#readme"
+  "homepage": "https://github.com/Alataq/keychaindb#readme",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }
