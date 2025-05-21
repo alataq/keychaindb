@@ -2,6 +2,11 @@ const SOCDriver = require("./driver/soc")
 const PersistentDriver = require("./driver/persistent")
 const SSCDriver = require("./driver/ssc")
 
+const EventType = Object.freeze({
+    REPEATABLE: 0,
+    ONCE: 1
+  });
+
 /**
  * @description The only class you'll ever need.
  */
@@ -21,13 +26,25 @@ class Database {
     }
 
     on(eventName, callback) {
-        this.events.push({ eventName, callback })
+        this.events.push({ eventName, callback, type: EventType.REPEATABLE });
+    }
+
+    once(eventName, callback){
+        this.events.push({ eventName, callback, type: EventType.ONCE });
     }
 
     emit(eventName, ...args) {
-        for(let event of this.events) {
-            if(event.eventName === eventName) {
-                event.callback(...args)
+        // Iterate backwards to safely remove items while iterating
+        for (let i = this.events.length - 1; i >= 0; i--) {
+            const event = this.events[i];
+            if (event.eventName === eventName) {
+                // Execute the callback first
+                event.callback(...args);
+                
+                // Remove if it's a once-time event
+                if (event.type === EventType.ONCE) {
+                    this.events.splice(i, 1);
+                }
             }
         }
     }
@@ -189,4 +206,4 @@ class Database {
     }
 }
 
-module.exports = {Database, SOCDriver, PersistentDriver, SSCDriver}
+module.exports = {Database, SOCDriver, PersistentDriver, SSCDriver, EventType}
