@@ -20,7 +20,6 @@
     "url": "https://github.com/Alataq/keychaindb/issues"
   },
   "homepage": "https://github.com/Alataq/keychaindb#readme",
-  "private": true,
   "devDependencies": {
     "@types/bun": "latest"
   },
