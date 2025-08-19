@@ -1,9 +1,11 @@
 import { PluginManager } from "./PluginManager";
 import { BasePlugin, Data, Value } from "./BasePlugin";
+import { EventManager, EventType } from "./EventManager";
 
 export class Database {
     private pluginManager: PluginManager;
     private cache: Map<string, Data> = new Map;
+    private eventManager: EventManager = new EventManager;
 
     constructor() {
         this.pluginManager = new PluginManager(this);
@@ -11,6 +13,18 @@ export class Database {
 
     use(plugin: BasePlugin): object | undefined {
         return this.pluginManager.use(plugin);
+    }
+
+    on(name: string, callback: (...args: any[]) => void): void {
+        this.eventManager.register({ name, type: EventType.REPEATABLE, callback });
+    }
+
+    once(name: string, callback: (...args: any[]) => void): void {
+        this.eventManager.register({ name, type: EventType.ONCE, callback });
+    }
+
+    off(name: string): void {
+        this.eventManager.purge(name);
     }
 
     set(key: string, value: Value) {
@@ -24,7 +38,11 @@ export class Database {
             this.cache.set(key, data);
             
             this.pluginManager.afterSet(key, data);
-            this.pluginManager.onSet(key, data);
+
+            setTimeout(() => {
+                this.pluginManager.onSet(key, data);
+                this.eventManager.emit("set", key, data);
+            }, 0);
         });
     }
 
@@ -38,7 +56,11 @@ export class Database {
             if (data) {
                 result = data.value;
                 this.pluginManager.afterGet(key, data);
-                this.pluginManager.onGet(key, data);
+
+                setTimeout(() => {
+                    this.pluginManager.onGet(key, data);
+                    this.eventManager.emit("get", key, data);
+                }, 0);
             }
         });
 
@@ -51,7 +73,11 @@ export class Database {
             
             if (this.cache.delete(key)) {
                 this.pluginManager.afterDelete(key);
-                this.pluginManager.onDelete(key);
+
+                setTimeout(() => {
+                    this.pluginManager.onDelete(key);
+                    this.eventManager.emit("delete", key);
+                }, 0);
             }
         });
     }
