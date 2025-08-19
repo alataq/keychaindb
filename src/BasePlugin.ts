@@ -1,5 +1,10 @@
-type PrimitiveValue = string | number | boolean;
-export type Value = PrimitiveValue | PrimitiveValue[];
+type PrimitiveValue = string | number | boolean | null; // Added 'null' for full JSON compatibility
+type JSONObject = { [key: string]: JSONValue };
+type JSONArray = JSONValue[];
+type JSONValue = PrimitiveValue | JSONObject | JSONArray;
+
+export type Value = JSONValue;
+
 
 export interface Data {
     value: Value;
