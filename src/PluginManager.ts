@@ -9,9 +9,10 @@ export class PluginManager {
         this.db = db;
     }
 
-    use(plugin: BasePlugin) {
+    use(plugin: BasePlugin): object | undefined {
         this.plugins.push(plugin);
         plugin.onLoad(this.db);
+        return plugin.api;
     }
 
     private runHookChain(hooks: (Function | undefined)[], initialArgs: any[], finalCallback: (...args: any[]) => void) {
