@@ -1,14 +1,13 @@
 # KeychainDB
 
-KeychainDB is a fast and lightweight key-value database designed for simplicity and efficiency. It supports various data types, including strings, numbers, booleans, arrays, and JSON objects. The database also includes features like data expiration and event-driven operations.
+KeychainDB is a fast, lightweight, and modular key-value database. Its new `v2` architecture is built on a simple core that uses a powerful plugin system, allowing you to add features like persistence, caching, and more without changing the core database logic.
 
 ## Features
 
 - **Fast Key-Value Storage**: Store and retrieve data quickly using simple key-value pairs.
-- **Multiple Data Types**: Supports strings, numbers, booleans, arrays, and JSON objects.
-- **Data Expiration**: Set expiration times for keys to automatically remove stale data.
-- **Event-Driven**: Listen for events like `set`, `delete`, and `ready` to trigger custom logic.
-- **Persistence**: Uses the SOCDriver or SSCDriver to persist data to a file, ensuring data is not lost between sessions.
+- **Modular & Plugin-based**: The core database provides fundamental operations, and all advanced functionality (like persistence) is handled by plugins.
+- **Flexible Data Types**: Supports any valid **JSON data type**, including strings, numbers, booleans, arrays, and nested JSON objects.
+- **Event-Driven**: Listen for events like `set`, `get`, and `delete` to trigger custom logic.
 
 ## Installation
 
@@ -19,157 +18,101 @@ npm install keychaindb
 ```
 
 ## Usage
-### Initialization
-To start using KeychainDB, initialize the database :
 
-```js
-const { Database } = require("keychaindb");
+### Initialization
+To start using KeychainDB, initialize the database.
+
+```typescript
+import { Database } from "keychaindb";
 
 const db = new Database();
 ```
-### Setting Values
-You can set values with an optional expiration time (in milliseconds):
 
-```js
-db.set("key", "value", 10000); // expires in 10 seconds
+### Setting Values
+You can set values for any valid JSON data type.
+
+```typescript
+db.set("user:1", { name: "John", age: 30 });
+db.set("product:123", { name: "Laptop", price: 1200 });
+db.set("status", true);
+db.set("numbers", [10, 20, 30]);
+db.set("message", "Hello World");
 ```
 
 ### Getting Values
-Retrieve values using the get method:
+Retrieve values using the `get` method.
 
-```js
-db.get("key")
+```typescript
+const user = db.get("user:1");
+console.log(user.name); // Output: John
+
+const price = db.get("product:123");
+console.log(price); // Output: 1200
 ```
+
 ### Deleting Values
-Delete values using the delete method:
+Delete values using the `delete` method.
 
-```js
-db.delete("key");
+```typescript
+db.delete("user:1");
 ```
 
-### Finding Values
-Find values using the find method:
+## Plugin System
 
-**You can find all keys having a specific value**
+The `v2` architecture uses plugins to extend functionality. You use the `db.use()` method to add a plugin.
 
-```js
-db.find("value")
-```
+```typescript
+import { Database, MyPlugin } from "keychaindb";
 
-**You can use json to find values**
+const db = new Database();
 
-```js
-db.find({ name: "John", age: 30 });
-```
-
-**You can use a function to find values**
-
-```js
-db.find((value) => value.name === "John" && value.age > 25);
-```
-
-**You can use a regex to find values**
-
-```js
-db.find(/hello/);
-```
-
-### Getting all Keys
-You can get all keys using the keys method:
-
-```js
-db.keys()
-```
-
-### Getting all Values
-You can get all values using the values method:
-```js
-db.values()
-```
-
-### Getting all Entries
-You can get all entries using the entries method:
-
-```js
-db.entries()
+// Use your custom plugin to add functionality
+db.use(new MyPlugin());
 ```
 
 ### Event Handling
-Listen for events like ready, set, and delete:
 
-```js
-db.on("ready", () => {
-    console.log("Database is ready");
-});
+You can listen for database events using the `on` or `once` methods. All events are now **asynchronous**.
 
-db.on("set", (key, value, writedate, expire) => {
-    console.log(`Key ${key} set with value ${value}`);
+```typescript
+db.on("set", (key, data) => {
+    console.log(`[Event] Key ${key} was set with value: ${data.value}`);
 });
 
 db.on("delete", (key) => {
-    console.log(`Key ${key} deleted`);
+    console.log(`[Event] Key ${key} was deleted`);
+});
+
+// To listen for an event only one time
+db.once("get", (key, data) => {
+    console.log(`[Event] Key ${key} was retrieved for the first time`);
 });
 ```
 
-To avoid bug, if an event need to be listen only one time, you can use the once method:
+To stop listening for events, use `db.off()`.
 
-```js
-db.once("ready", () => {
-    console.log("Database is ready");
-});
+```typescript
+db.off("set");
 ```
 
-### Logging In
-To start the database, call the login method:
+## Built-in Plugins
 
-```js
-db.login();
+KeychainDB offers a simple built-in driver for persistence.
+
+### BasePersistencePlugin
+
+This plugin provides basic persistence functionality and serves as a template for more complex drivers.
+
+#### Usage
+To add this plugin, you use the `db.use` method.
+
+```typescript
+import { Database, BasePersistencePlugin } from "keychaindb";
+
+const db = new Database();
+db.use(new BasePersistencePlugin());
 ```
-
-# Builtin Drivers
-KeychainDB offer some builtin drivers for your databases. The following drivers are available:
-
-## Solid Operation Cache (SOC)
-The SOC driver store every write operation in a file to allow reconstruction of the database in case of reboot.
-
-### Initialization
-You first need to import the SOC driver and initialize it. You need to have path for the file name. :
-
-```js
-const { SOCDriver } = require("keychainedb");
-const path = require("path");
-
-db.use(SOCDriver, { path: path.join(__dirname, "fileName.kcdb") });
-```
-
-### Rebuilding
-You can rebuild the database by calling the reconstruct method on the SOC manager. It will return a promise. :
-
-```js
-db.SOCManager.reconstruct()
-```
-
-## Solid State Cache (SSC)
-The Solid State Cache driver stores database content into a key/value file periodically, to recover from shutdowns
-with a concise representation of the database.
-
-### Initialization
-You first need to import the SSC driver and initialize it. You need to give if a path to save to:
-
-```js
-const { SSCDriver } = require("keychaindb");
-const path = require("path");
-
-db.use(SSCDriver, { path: path.join(__dirname, "ssc.kcdb") });
-```
-
-### Rebuilding
-You can rebuild the database instance from the content stored on the disk by calling:
-```js
-db.fromStorage();
-```
-
-The operation is synchronous.
+This will enable the `afterSet` and `afterDelete` hooks, which can be extended to write to disk.
 
 # License
 KeychainDB is licensed under the ISC License. See the LICENSE file for more details.
