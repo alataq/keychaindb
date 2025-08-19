@@ -31,7 +31,7 @@ export class EventManager {
         this.events = this.events.filter(event => event.name !== name);
     }
 
-    public emit(name: string, ...args: any[]): void {
+    public async emit(name: string, ...args: any[]): Promise<void> {
         const matchingEvents = this.events.filter(e => e.name === name);
 
         for (const event of matchingEvents) {
