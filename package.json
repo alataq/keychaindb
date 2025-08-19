@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Alataq/keychaindb#readme",
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.2.20",
     "@types/node": "^24.3.0"
   },
   "peerDependencies": {

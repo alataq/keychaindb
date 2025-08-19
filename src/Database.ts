@@ -1,5 +1,5 @@
 import { PluginManager } from "./PluginManager";
-import { BasePlugin, Data, Value } from "./BasePlugin";
+import { BasePlugin, type Data, type Value } from "./BasePlugin";
 import { EventManager, EventType } from "./EventManager";
 
 export class Database {
