@@ -1,110 +1,191 @@
+import { describe, test, expect, mock } from "bun:test";
 import { Database, BasePlugin } from './src';
-import { type Data, type Value } from './src/BasePlugin';
-import { EventType } from './src/EventManager';
+import type { Data, Value } from './src/BasePlugin';
 
-// Helper function to create a mock function
-const mockFn = () => {
-    const fn = (...args: any[]) => {
-        fn.called = true;
-        fn.calls.push(args);
-    };
-    fn.called = false;
-    fn.calls = [] as any[]; // Explicitly type 'calls'
-    return fn;
-};
+// --- Helper for async tests ---
+const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 
-// ANSI color codes
-const color = {
-    green: (text: string) => `\x1b[32m${text}\x1b[0m`,
-    red: (text: string) => `\x1b[31m${text}\x1b[0m`,
-    cyan: (text: string) => `\x1b[36m${text}\x1b[0m`
-};
-const pass = color.green("PASS");
-const fail = color.red("FAIL");
-const testStatus = (name: string, condition: boolean) => {
-    console.log(`${condition ? pass : fail} - ${name}`);
-};
+// --- Test Suite ---
 
-// A simple persistence plugin for demonstration
-class BasePersistencePlugin extends BasePlugin {
-    onLoad(db: Database) {
-        console.log("Persistence plugin loaded. Ready to track database changes.");
-    }
+describe("Database Core Functionality", () => {
+    let db: Database;
 
-    afterSet(key: string, data: Data) {
-        // Simulate saving to a file or other storage
-        console.log(`[Persistence] Data for key '${key}' was updated. Value:`, data.value);
-    }
-
-    afterDelete(key: string) {
-        // Simulate deleting from a file or other storage
-        console.log(`[Persistence] Data for key '${key}' was deleted.`);
-    }
-}
-
-// ----------------------------------------------------------------------
-// Main Demonstration Script
-// ----------------------------------------------------------------------
-
-(async () => {
-    // Initialize the database
-    const db = new Database();
-    const persistencePlugin = new BasePersistencePlugin();
-    db.use(persistencePlugin);
-
-    // Event listener for when a value is set
-    db.on("set", (key: string, data: any) => {
-        console.log(`[Event] Key ${key} set with value ${data.value}`);
+    // Initialize a new database before each test
+    test("Initialization", () => {
+        db = new Database();
+        expect(db).toBeInstanceOf(Database);
     });
 
-    // Event listener for when a value is deleted
-    db.on("delete", (key: string) => {
-        console.log(`[Event] Key ${key} deleted`);
+    // Test basic set and get operations
+    test("should set and get a value", () => {
+        db = new Database();
+        db.set("key1", "value1");
+        expect(db.get("key1")).toBe("value1");
     });
 
-    console.log(color.cyan("--- Database Test Start ---"));
-    
-    // Test 1: set, get, and delete a value correctly without plugins
-    const key1 = 'testKey';
-    const value1 = 'testValue';
-    db.set(key1, value1);
-    const result1 = db.get(key1);
-    testStatus("should set and get a value correctly", result1 === value1);
+    // Test updating an existing value
+    test("should update an existing value", () => {
+        db = new Database();
+        db.set("key1", "value1");
+        db.set("key1", "newValue");
+        expect(db.get("key1")).toBe("newValue");
+    });
 
-    db.delete(key1);
-    const result2 = db.get(key1);
-    testStatus("should delete a value correctly", result2 === undefined);
+    // Test deleting a value
+    test("should delete a value", () => {
+        db = new Database();
+        db.set("key1", "value1");
+        db.delete("key1");
+        expect(db.get("key1")).toBeUndefined();
+    });
 
-    // Test 2: Set multiple values
-    db.set("key1", "value1");
-    db.set("key2", 42);
-    db.set("key3", true);
-    db.set("key4", [1, 2, 3]);
-    db.set("key5", { name: "John", age: 30 } as any); // Type assertion for object
-    db.set("key6", { name: "Jane", age: 25 } as any); // Type assertion for object
-    db.set("key7", { name: "John", age: 35 } as any); // Type assertion for object
-    db.set("key8", "Hello World");
+    // Test getting a non-existent value
+    test("should return undefined for a non-existent key", () => {
+        db = new Database();
+        expect(db.get("nonexistent")).toBeUndefined();
+    });
+});
 
-    // Test 3: Get multiple values
-    console.log("\nInitial values:");
-    console.log("key1 (string):", db.get("key1"));
-    console.log("key2 (number):", db.get("key2"));
-    console.log("key3 (boolean):", db.get("key3"));
-    console.log("key4 (array):", db.get("key4"));
-    console.log("key5 (json):", db.get("key5"));
-    testStatus("should get all values correctly", 
-        db.get("key1") === "value1" && 
-        db.get("key2") === 42 &&
-        db.get("key3") === true &&
-        (db.get("key4") as any)[0] === 1
-    );
+describe("Database Data Types", () => {
+    let db: Database;
 
-    // Test 4: Deletion after a short delay
-    console.log("\nAfter 2 seconds (delete key2):");
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    db.delete("key2");
-    console.log("key2 (number):", db.get("key2"));
-    testStatus("should delete a value after a delay", db.get("key2") === undefined);
-    
-    console.log("\n--- Database Test Complete ---");
-})();
+    test("should handle various data types", () => {
+        db = new Database();
+        const testData = {
+            string: "hello world",
+            number: 123,
+            boolean: true,
+            nullValue: null,
+            array: [1, "test", { a: 1 }],
+            object: { b: 2, c: "nested" }
+        };
+
+        for (const [key, value] of Object.entries(testData)) {
+            db.set(key, value as Value);
+        }
+
+        for (const [key, value] of Object.entries(testData)) {
+            expect(db.get(key)).toEqual(value);
+        }
+    });
+});
+
+describe("Database Events", () => {
+    let db: Database;
+
+    test("should emit 'set' event", async () => {
+        db = new Database();
+        const mockCallback = mock((key, data) => {
+            expect(key).toBe("key1");
+            expect(data.value).toBe("value1");
+        });
+        db.on("set", mockCallback);
+        db.set("key1", "value1");
+        await tick();
+        expect(mockCallback).toHaveBeenCalled();
+    });
+
+    test("should emit 'get' event", async () => {
+        db = new Database();
+        const mockCallback = mock((key, data) => {
+            expect(key).toBe("key1");
+            expect(data.value).toBe("value1");
+        });
+        db.on("get", mockCallback);
+        db.set("key1", "value1");
+        db.get("key1");
+        await tick();
+        expect(mockCallback).toHaveBeenCalled();
+    });
+
+    test("should emit 'delete' event", async () => {
+        db = new Database();
+        const mockCallback = mock((key) => {
+            expect(key).toBe("key1");
+        });
+        db.on("delete", mockCallback);
+        db.set("key1", "value1");
+        db.delete("key1");
+        await tick();
+        expect(mockCallback).toHaveBeenCalled();
+    });
+
+    test("should handle 'once' events correctly", async () => {
+        db = new Database();
+        const mockCallback = mock(() => {});
+        db.once("set", mockCallback);
+        db.set("key1", "value1");
+        db.set("key2", "value2");
+        await tick();
+        expect(mockCallback).toHaveBeenCalledTimes(1);
+    });
+
+    test("should remove event listeners with 'off'", async () => {
+        db = new Database();
+        const mockCallback = mock(() => {});
+        db.on("set", mockCallback);
+        db.off("set");
+        db.set("key1", "value1");
+        await tick();
+        expect(mockCallback).not.toHaveBeenCalled();
+    });
+});
+
+describe("Database Plugins", () => {
+    let db: Database;
+
+    class TestPlugin extends BasePlugin {
+        public api = {
+            getPluginName: () => "TestPlugin"
+        };
+
+        onLoad = mock(() => {});
+        beforeSet = mock((key, value, data, next) => next(key, value, data));
+        afterSet = mock(() => {});
+        beforeGet = mock((key, next) => next(key));
+        afterGet = mock(() => {});
+        beforeDelete = mock((key, next) => next(key));
+        afterDelete = mock(() => {});
+    }
+
+    let plugin: TestPlugin;
+
+    test("should load a plugin and call onLoad", () => {
+        db = new Database();
+        plugin = new TestPlugin();
+        const api = db.use(plugin);
+        expect(plugin.onLoad).toHaveBeenCalledWith(db);
+        expect(api?.getPluginName()).toBe("TestPlugin");
+    });
+
+    test("should trigger plugin hooks for set, get, and delete", () => {
+        db = new Database();
+        plugin = new TestPlugin();
+        db.use(plugin);
+
+        db.set("key1", "value1");
+        expect(plugin.beforeSet).toHaveBeenCalled();
+        expect(plugin.afterSet).toHaveBeenCalled();
+
+        db.get("key1");
+        expect(plugin.beforeGet).toHaveBeenCalled();
+        expect(plugin.afterGet).toHaveBeenCalled();
+
+        db.delete("key1");
+        expect(plugin.beforeDelete).toHaveBeenCalled();
+        expect(plugin.afterDelete).toHaveBeenCalled();
+    });
+
+    test("plugin can modify data before setting", () => {
+        db = new Database();
+        class ModifyPlugin extends BasePlugin {
+            beforeSet(key: string, value: Value, data: Data, next: (k: string, v: Value, d: Data) => void) {
+                next(key, `modified-${value}`, data);
+            }
+            onLoad(db: Database): void {}
+        }
+        db.use(new ModifyPlugin());
+        db.set("key1", "value1");
+        expect(db.get("key1")).toBe("modified-value1");
+    });
+});
